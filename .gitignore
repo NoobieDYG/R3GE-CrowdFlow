@@ -1,0 +1,6 @@
+venv/
+venv/Lib/
+yolov8n.pt/
+yolov8x.pt/
+*.log
+__pycache__/
