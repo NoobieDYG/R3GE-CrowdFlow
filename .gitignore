@@ -4,3 +4,5 @@ yolov8n.pt/
 yolov8x.pt/
 *.log
 __pycache__/
+yolov8n.pt
+yolov8x.pt
