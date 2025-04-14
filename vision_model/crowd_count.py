@@ -1,0 +1,133 @@
+
+import cv2
+import torch
+import numpy as np
+from torchvision import transforms
+import requests
+import json
+from vision_script_cv import convert_url
+
+from csrnet_model import load_csrnet_model_1, load_csrnet_model_2
+
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model_1 = load_csrnet_model_1("vision_model\\weights\\csrnet_pretrained.pth", device)
+model_2=load_csrnet_model_2("vision_model\\weights\\csrnet_pretrained_2.pth", device)
+if device.type == "cuda":
+    model_1 = model_1.half()  #check here
+    model_2 = model_2.half()
+
+
+transform = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                         std=[0.229, 0.224, 0.225]),
+])
+
+
+def density_to_heatmap(density_map):
+    density_map = density_map.squeeze().cpu().numpy()
+    density_map = cv2.GaussianBlur(density_map, (15, 15), 0)
+    density_map /= (density_map.max() + 1e-6)
+    heatmap = cv2.applyColorMap((density_map * 255).astype(np.uint8), cv2.COLORMAP_JET)
+    heatmap = cv2.GaussianBlur(heatmap, (15, 15), 0)
+    heatmap_resized=cv2.resize(heatmap, (640, 480))
+    return heatmap_resized
+
+
+def get_zone_occupancy_percentage(density_map, zones=(2, 2)):
+    density_np = density_map.squeeze().cpu().numpy()
+    h, w = density_np.shape
+    total_density = density_np.sum()  
+    zone_occupancy = []
+    
+    zh, zw = h // zones[0], w // zones[1]
+    
+    for i in range(zones[0]):
+        for j in range(zones[1]):
+            sub = density_np[i*zh:(i+1)*zh, j*zw:(j+1)*zw]
+            zone_density = sub.sum()
+            zone_percentage = (zone_density / (total_density + 1e-6)) * 100  
+            zone_occupancy.append(round(zone_percentage, 2))
+    
+    return zone_occupancy
+
+
+def get_zone_counts(density_map, zones=(2, 2)):
+    
+    density_np = density_map.squeeze().cpu().numpy()
+    h, w = density_np.shape
+    zone_counts = []
+    
+    
+    zh, zw = h // zones[0], w // zones[1]
+    
+    for i in range(zones[0]):
+        for j in range(zones[1]):
+            
+            sub = density_np[i*zh:(i+1)*zh, j*zw:(j+1)*zw]
+            zone_count = sub.sum()  
+            zone_counts.append(round(zone_count, 2))  
+    
+    return zone_counts
+
+
+def send_json_data(zone_occupancy,zone_count, endpoint="http://localhost:8000/crowd_data"):
+    try:
+        payload = {"zone_counts": zone_count,
+                   "zone_occupancy": zone_occupancy}
+        headers = {"Content-Type": "application/json"}
+        requests.post(endpoint, data=json.dumps(payload), headers=headers)
+    except Exception as e:
+        print("JSON send failed:", e)
+
+
+def process_crowd_video(video_path):
+    cap = cv2.VideoCapture(video_path)
+
+    if not cap.isOpened():
+        print(f"Failed to open video: {video_path}")
+        return
+    frame_count=0
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+        frame_count += 1
+        if frame_count % 10 != 0: #check here
+            continue
+        resized = cv2.resize(frame, (640, 480))
+        input_tensor = transform(resized).unsqueeze(0).to(device)
+
+        if device.type == "cuda":     ##check here
+            input_tensor = input_tensor.half()
+
+        with torch.no_grad():
+            density_map = model_2(input_tensor)
+            total_count = density_map.sum().item()
+
+        
+        heatmap = density_to_heatmap(density_map)
+        overlay = cv2.addWeighted(resized, 0.5, heatmap, 0.5, 0)
+
+        cv2.putText(overlay, f"Count: {int(total_count)}", (10, 40),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1.2, (255, 255, 255), 2)
+
+        zone_count= get_zone_counts(density_map)
+        zone_occupancy = get_zone_occupancy_percentage(density_map)
+        #send_json_data(zone_occupancy,zone_count)
+        print("Zone Occupancy Percentages:", zone_occupancy)
+        print("Zone Counts:", zone_count)
+        
+        cv2.imshow("Crowd Heatmap", overlay)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+        cv2.waitKey(30)
+
+    cap.release()
+    cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    video_path='https://www.youtube.com/watch?v=oXfcfd_2OXM'
+    stream_url=convert_url(video_path)
+    process_crowd_video(stream_url)
