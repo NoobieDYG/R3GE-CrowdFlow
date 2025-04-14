@@ -115,9 +115,9 @@ def process_crowd_video(video_path):
 
         zone_count= get_zone_counts(density_map)
         zone_occupancy = get_zone_occupancy_percentage(density_map)
-        #send_json_data(zone_occupancy,zone_count)
-        print("Zone Occupancy Percentages:", zone_occupancy)
-        print("Zone Counts:", zone_count)
+        send_json_data(zone_occupancy,zone_count)
+        #print("Zone Occupancy Percentages:", zone_occupancy)
+        #print("Zone Counts:", zone_count)
         
         cv2.imshow("Crowd Heatmap", overlay)
         if cv2.waitKey(1) & 0xFF == ord('q'):
