@@ -128,6 +128,6 @@ def process_crowd_video(video_path):
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    video_path='https://www.youtube.com/watch?v=oXfcfd_2OXM'
+    video_path='https://www.youtube.com/watch?v=KjBUK1UIv_U'
     stream_url=convert_url(video_path)
     process_crowd_video(stream_url)
