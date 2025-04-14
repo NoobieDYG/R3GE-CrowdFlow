@@ -15,7 +15,7 @@ model_1 = load_csrnet_model_1("vision_model\\weights\\csrnet_pretrained.pth", de
 model_2=load_csrnet_model_2("vision_model\\weights\\csrnet_pretrained_2.pth", device)
 if device.type == "cuda":
     model_1 = model_1.half()  #check here
-    model_2 = model_2.half()
+    model_2 = model_2.half()  #if not rtx comment this if block
 
 
 transform = transforms.Compose([
@@ -100,7 +100,7 @@ def process_crowd_video(video_path):
         input_tensor = transform(resized).unsqueeze(0).to(device)
 
         if device.type == "cuda":     ##check here
-            input_tensor = input_tensor.half()
+            input_tensor = input_tensor.half() ##if not rtx comment this if block
 
         with torch.no_grad():
             density_map = model_2(input_tensor)
