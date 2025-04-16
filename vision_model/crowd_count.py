@@ -83,6 +83,7 @@ def send_json_data(zone_occupancy,zone_count, endpoint="http://localhost:8000/cr
 
 
 def process_crowd_video(video_path):
+    video_path=convert_url(video_path)
     cap = cv2.VideoCapture(video_path)
 
     if not cap.isOpened():
@@ -128,6 +129,6 @@ def process_crowd_video(video_path):
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    video_path='https://www.youtube.com/watch?v=KjBUK1UIv_U'
-    stream_url=convert_url(video_path)
-    process_crowd_video(stream_url)
+    video_path='https://www.youtube.com/watch?v=7jlvN81lYJQ'  # Replace with your video URL or path
+    #stream_url=convert_url(video_path)
+    process_crowd_video(video_path)
