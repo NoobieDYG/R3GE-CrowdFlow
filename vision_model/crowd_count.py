@@ -191,9 +191,9 @@ def process_crowd_video(video_path):
             ((0, h // 2), (w // 2, h)),          # Zone 3 - Bottom Left
             ((w // 2, h // 2), (w, h))           # Zone 4 - Bottom Right
         ]
-        zone_labels = ["Zone 1", "Zone 2", "Zone 3", "Zone 4"]
+        zone_labels = ["Zone 1", "Zone 3", "Zone 2", "Zone 4"]
         box_colors = [(0, 255, 0), (255, 255, 0), (0, 255, 255), (255, 0, 255)]
-
+        zones=zones[::-1]  # Reversing the order of zones
         for i, ((x1, y1), (x2, y2)) in enumerate(zones):
             cv2.rectangle(overlay, (x1, y1), (x2, y2), box_colors[i], 2)
             cv2.putText(overlay, zone_labels[i], (x1 + 10, y1 + 30),
