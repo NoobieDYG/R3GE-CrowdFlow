@@ -6,7 +6,10 @@ from torchvision import transforms
 import requests
 import json
 import sys
-sys.path.append('C:/Users/Affaan Jaweed/Desktop/crowd_control_hackazrd/vision_model')
+import os
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+VISION_MODEL_DIR = os.path.join(BASE_DIR, 'vision_model')
+sys.path.append(VISION_MODEL_DIR)
 from vision_script_cv import convert_url
 
 #from vision_script_cv import convert_url

@@ -19,7 +19,7 @@ def convert_url(yt_url):
         info=ydl.extract_info(yt_url, download=False)
         return info['url']
 
-def video_process(video_path):
+'''def video_process(video_path):
     cap= cv.VideoCapture(video_path)
     if not cap.isOpened():
         print("Error: Could not open video.")
@@ -122,7 +122,7 @@ def get_crowd_counts_yolo(frame, zones):
                 counts[i] += 1
                 break
 
-    return counts
+    return counts'''
 
 if __name__ == "__main__":
     #video_path="C:\\Users\\Affaan Jaweed\\Desktop\\crowd_control_hackazrd\\vision_model\\dataset\\umrah_test_1.mp4"
@@ -130,4 +130,4 @@ if __name__ == "__main__":
     stream_url=convert_url(video_path)
 
     #video_process(video_path)
-    display_heat_video(stream_url)  
+    #display_heat_video(stream_url)  
