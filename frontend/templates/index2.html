@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crowd Control System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        
+        body {
+            background-color: #131313;
+            color: #f5f5f5;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            grid-gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            padding: 10px;
+            background-color: #1e1e1e;
+            border-radius: 5px;
+        }
+        
+        .video-container {
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .video-feed {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background-color: #232323;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .video-feed img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        
+        .video-controls {
+            display: flex;
+            padding: 10px;
+            background-color: #252525;
+        }
+        
+        .video-url-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            background-color: #333;
+            color: #fff;
+            border-radius: 4px 0 0 4px;
+        }
+        
+        .load-btn {
+            padding: 8px 15px;
+            background-color: #0277bd;
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .load-btn:hover {
+            background-color: #0288d1;
+        }
+        
+        .error-message {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: #f5f5f5;
+            text-align: center;
+        }
+        
+        .error-icon {
+            background-color: #333;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            color: #f5f5f5;
+            margin-bottom: 10px;
+        }
+        
+        .error-message a {
+            color: #0288d1;
+            text-decoration: none;
+        }
+        
+        .zone-controls {
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .zones-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .zone-card {
+            border-radius: 5px;
+            padding: 10px;
+            border: 1px solid;
+            position: relative;
+        }
+        
+        .zone-1 {
+            border-color: #4CAF50;
+        }
+        
+        .zone-2, .zone-3, .zone-4 {
+            border-color: #4CAF50;
+        }
+        
+        .zone-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .zone-slider {
+            width: 100%;
+            height: 8px;
+            background-color: #333;
+            border-radius: 4px;
+            margin: 10px 0;
+            position: relative;
+        }
+        
+        .zone-slider-fill {
+            height: 100%;
+            border-radius: 4px;
+            width: 0%;
+        }
+        
+        .zone-1 .zone-slider-fill {
+            background-color: #4CAF50;
+            width: 100%;
+        }
+        
+        .zone-2 .zone-slider-fill, .zone-3 .zone-slider-fill, .zone-4 .zone-slider-fill {
+            background-color: #4CAF50;
+        }
+        
+        .zone-2 .zone-slider-fill {
+            width: 40%;
+        }
+        
+        .zone-3 .zone-slider-fill {
+            width: 6%;
+        }
+        
+        .zone-4 .zone-slider-fill {
+            width: 10%;
+        }
+        
+        .zone-values {
+            font-size: 0.8rem;
+            color: #b0b0b0;
+        }
+        
+        .zone-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+            font-size: 0.8rem;
+        }
+        
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        
+        .status-critical {
+            background-color: #f44336;
+        }
+        
+        .status-normal {
+            background-color: #4CAF50;
+        }
+        
+        .chat-container {
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-height: 300px;
+            max-height: calc(100vh - 200px);
+        }
+        
+        .chat-message {
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        
+        .empty-chat-message {
+            color: #888;
+            text-align: center;
+            margin: auto;
+            font-size: 0.9rem;
+        }
+        
+        .system-message {
+            background-color: #333;
+            align-self: center;
+            text-align: center;
+            font-size: 0.9rem;
+            padding: 5px 10px;
+            border-radius: 15px;
+            margin: 5px 0;
+            color: #b0b0b0;
+        }
+        
+        .user-message {
+            background-color: #0277bd;
+            align-self: flex-end;
+        }
+        
+        .bot-message {
+            background-color: #333;
+            align-self: flex-start;
+            color: white;
+        }
+        
+        .chat-input-container {
+            display: flex;
+            padding: 10px;
+            background-color: #252525;
+            border-radius: 0 0 10px 10px;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background-color: #333;
+            color: white;
+            border-radius: 4px 0 0 4px;
+            resize: none;
+        }
+        
+        .send-btn {
+            padding: 0 15px;
+            background-color: #0277bd;
+            color: white;
+            border: none;
+            border-radius: 0;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .send-btn:hover {
+            background-color: #0288d1;
+        }
+        
+        .tts-btn {
+            padding: 0 15px;
+            background-color: #5e35b1;
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .tts-btn:hover {
+            background-color: #7e57c2;
+        }
+        
+        .bullet-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .bullet-list li {
+            position: relative;
+            padding-left: 15px;
+            margin-bottom: 5px;
+        }
+        
+        .bullet-list li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+        }
+        
+        @media (max-width: 992px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .zones-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .zones-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-column">
+            <div class="video-container">
+                <div class="section-title">
+                    <i class="fas fa-video"></i> Live Video Feed
+                </div>
+                <div class="video-feed" id="videoFeed">
+                    <div class="error-message">
+                        <div class="error-icon">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <p>An error occurred. Please try again later. (Playback ID: BaQAFZ7LH0CcdVqW)</p>
+                        <a href="#" id="learnMore">Learn More</a>
+                    </div>
+                </div>
+                <div class="video-controls">
+                    <input type="text" class="video-url-input" id="videoUrl" placeholder="Enter video URL...">
+                    <button class="load-btn" id="loadVideoBtn">Load Video</button>
+                </div>
+            </div>
+            
+            <div class="zone-controls">
+                <div class="section-title">
+                    <i class="fas fa-map-marker-alt"></i> Zone Controls
+                </div>
+                <div class="zones-grid" id="zonesGrid">
+                </div>
+            </div>
+        </div>
+        
+        <div class="right-column">
+            <div class="chat-container">
+                <div class="section-title">
+                    <i class="fas fa-robot"></i> AI Chat Interface
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="empty-chat-message">
+                        Chat messages will appear here<br>
+                        Ask about crowd levels, zone statuses, or<br>recommendations
+                    </div>
+                </div>
+                <div class="chat-input-container">
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Type your message...">
+                    <button class="send-btn" id="sendMessageBtn">Send</button>
+                    <button class="tts-btn" id="ttsBtn"><i class="fas fa-volume-up"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const zones = [
+            { id: 1, count: 0, max: 100, status: 'NORMAL' },
+            { id: 2, count: 0, max: 150, status: 'NORMAL' },
+            { id: 3, count: 0, max: 200, status: 'NORMAL' },
+            { id: 4, count: 0, max: 120, status: 'NORMAL' }
+        ];
+        
+        const videoFeedElement = document.getElementById('videoFeed');
+        const videoUrlInput = document.getElementById('videoUrl');
+        const loadVideoBtn = document.getElementById('loadVideoBtn');
+        const zonesGrid = document.getElementById('zonesGrid');
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendMessageBtn = document.getElementById('sendMessageBtn');
+        const ttsBtn = document.getElementById('ttsBtn');
+        
+        let isVideoLoaded = false;
+        let videoSource = null;
+        let chatHistory = [];
+        let zoneDataUpdater = null;
+        let suggestionUpdater = null;
+        
+        function init() {
+            renderZones();
+            setupEventListeners();
+            fetchZoneData();
+            startSuggestionUpdates();
+        }
+        
+        function renderZones() {
+            zonesGrid.innerHTML = '';
+            zones.forEach(zone => {
+                const occupancy = Math.round((zone.count / zone.max) * 100);
+                const statusClass = zone.status === 'CRITICAL' ? 'status-critical' : 'status-normal';
+                const zoneClass = zone.status === 'CRITICAL' ? 'zone-1' : `zone-${zone.id}`;
+                
+                const zoneCard = document.createElement('div');
+                zoneCard.className = `zone-card ${zoneClass}`;
+                zoneCard.innerHTML = `
+                    <div class="zone-title">Zone ${zone.id}</div>
+                    <div class="zone-slider">
+                        <div class="zone-slider-fill" style="width: ${occupancy}%"></div>
+                    </div>
+                    <div class="zone-values">${zone.count}/${zone.max}</div>
+                    <div class="zone-status">
+                        <div class="status-indicator ${statusClass}"></div>
+                        ${zone.status}
+                    </div>
+                `;
+                zonesGrid.appendChild(zoneCard);
+            });
+        }
+        
+        function setupEventListeners() {
+            loadVideoBtn.addEventListener('click', loadVideo);
+            sendMessageBtn.addEventListener('click', sendMessage);
+            ttsBtn.addEventListener('click', playTextToSpeech);
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        }
+        
+        function loadVideo() {
+            const videoUrl = videoUrlInput.value.trim();
+            if (!videoUrl) {
+                alert('Please enter a valid video URL');
+                return;
+            }
+            
+            videoFeedElement.innerHTML = '';
+            
+            const loadingElement = document.createElement('div');
+            loadingElement.className = 'error-message';
+            loadingElement.innerHTML = '<div class="error-icon"><i class="fas fa-spinner fa-spin"></i></div><p>Loading video feed...</p>';
+            videoFeedElement.appendChild(loadingElement);
+            
+            const encodedUrl = encodeURIComponent(videoUrl);
+            
+            const videoImg = document.createElement('img');
+            videoImg.src = `/video_feed?video_path=${encodedUrl}`;
+            videoImg.onerror = function() {
+                videoFeedElement.innerHTML = `
+                    <div class="error-message">
+                        <div class="error-icon">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <p>Failed to load video feed. Please check the URL and try again.</p>
+                    </div>
+                `;
+            };
+            
+            videoImg.onload = function() {
+                videoFeedElement.innerHTML = '';
+                videoFeedElement.appendChild(videoImg);
+                isVideoLoaded = true;
+                videoSource = videoUrl;
+            };
+        }
+          
+        
+
+        
+        function sendMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+            
+            addMessageToChat('user', message);
+            chatInput.value = '';
+            
+            fetch('/chat_bot', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.reply) {
+                    addMessageToChat('bot', data.reply);
+                }
+            })
+            .catch(error => {
+                console.error('Error sending message:', error);
+                addMessageToChat('system', 'Failed to send message. Please try again.');
+            });
+        }
+        
+        function playTextToSpeech() {
+            const lastBotMessage = chatHistory.filter(msg => msg.type === 'bot').pop();
+            if (!lastBotMessage) return;
+            
+            fetch('/text_to_speech', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ text: lastBotMessage.content })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('TTS request failed');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success && data.audio_url) {
+                    addMessageToChat('system', 'Playing audio...');
+                    const audio = new Audio(data.audio_url);
+                    audio.play().catch(error => {
+                        console.error('Audio playback error:', error);
+                        addMessageToChat('system', 'Failed to play audio.');
+                    });
+                } else {
+                    addMessageToChat('system', 'Failed to play audio.');
+                }
+            })
+            .catch(error => {
+                console.error('TTS error:', error);
+                addMessageToChat('system', 'Failed to play audio. Please try again.');
+            });
+        }
+        
+        function endChat() {
+            fetch('/end_chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                addMessageToChat('system', data.message);
+                startSuggestionUpdates();
+            })
+            .catch(error => {
+                console.error('Error ending chat:', error);
+            });
+        }
+        
+        function addMessageToChat(type, content) {
+            const emptyMessage = document.querySelector('.empty-chat-message');
+            if (emptyMessage) {
+                emptyMessage.remove();
+            }
+            
+            const messageElement = document.createElement('div');
+            
+            if (type === 'system') {
+                messageElement.className = 'system-message';
+                messageElement.textContent = content;
+            } else {
+                messageElement.className = `chat-message ${type}-message`;
+                
+                if (content.includes('- ') || content.includes('• ')) {
+                    const items = content.split(/[\n\r]+/).filter(item => item.trim().startsWith('- ') || item.trim().startsWith('• '));
+                    if (items.length > 0) {
+                        const ul = document.createElement('ul');
+                        ul.className = 'bullet-list';
+                        
+                        items.forEach(item => {
+                            const li = document.createElement('li');
+                            li.textContent = item.replace(/^[•-]\s+/, '');
+                            ul.appendChild(li);
+                        });
+                        
+                        messageElement.appendChild(ul);
+                    } else {
+                        messageElement.textContent = content;
+                    }
+                } else {
+                    messageElement.textContent = content;
+                }
+            }
+            
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            if (type !== 'system') {
+                chatHistory.push({ type, content });
+            }
+        }
+        
+        function fetchZoneData() {
+            fetch('/crowd_data')
+                .then(response => response.json())
+                .then(data => {
+                    updateZoneData(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching zone data:', error);
+                });
+            
+            if (!zoneDataUpdater) {
+                zoneDataUpdater = setInterval(fetchZoneData, 5000);
+            }
+        }
+        
+        function updateZoneData(data) {
+            if (!data || Object.keys(data).length === 0) return;
+            
+            Object.entries(data).forEach(([zoneKey, zoneData]) => {
+                const zoneId = parseInt(zoneKey.replace('zone_', ''));
+                const zoneIndex = zones.findIndex(z => z.id === zoneId);
+                
+                if (zoneIndex !== -1) {
+                    zones[zoneIndex].count = zoneData.count;
+                    const occupancyPercentage = zoneData.occupancy;
+                    zones[zoneIndex].max = Math.ceil(zoneData.count / (occupancyPercentage / 100));
+                    
+                    zones[zoneIndex].status = occupancyPercentage >= 95 ? 'CRITICAL' : 
+                                             occupancyPercentage >= 85 ? 'CROWDED' : 
+                                             occupancyPercentage >= 55 ? 'MODERATE' : 'NORMAL';
+                }
+            });
+            
+            renderZones();
+        }
+        
+        function getSuggestion() {
+            fetch('/get_suggestion')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.suggestion && data.suggestion.trim() !== '') {
+                        if (chatMessages.children.length === 1 && chatMessages.children[0].classList.contains('empty-chat-message')) {
+                            chatMessages.innerHTML = '';
+                        }
+                        
+                        const lastMessage = chatHistory.length > 0 ? chatHistory[chatHistory.length - 1] : null;
+                        if (!lastMessage || lastMessage.type !== 'bot' || lastMessage.content !== data.suggestion) {
+                            addMessageToChat('bot', data.suggestion);
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error getting suggestion:', error);
+                });
+        }
+        
+        function startSuggestionUpdates() {
+            getSuggestion();
+            if (!suggestionUpdater) {
+                suggestionUpdater = setInterval(getSuggestion, 35000);
+            }
+        }
+        
+        function stopSuggestionUpdates() {
+            if (suggestionUpdater) {
+                clearInterval(suggestionUpdater);
+                suggestionUpdater = null;
+            }
+        }
+        
+        window.addEventListener('DOMContentLoaded', init);
+        
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const videoParam = urlParams.get('video');
+            if (videoParam) {
+                videoUrlInput.value = decodeURIComponent(videoParam);
+                loadVideo();
+            }
+        });
+    </script>
+</body>
+</html>
