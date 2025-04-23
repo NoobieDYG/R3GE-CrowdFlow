@@ -1,13 +1,17 @@
 from flask import Flask, request, jsonify,Response,render_template,url_for
 import sys
-sys.path.append('C:/Users/Affaan Jaweed/Desktop/crowd_control_hackazrd')
-from vision_model.crowd_count import process_crowd_video
-from dotenv import load_dotenv
 import os
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(BASE_DIR)
+
+from vision_model.crowd_count import process_crowd_video
+
+from dotenv import load_dotenv
 import openai
 from flask_cors import CORS
 
-app = Flask(__name__,template_folder='C:\\Users\\Affaan Jaweed\\Desktop\\crowd_control_hackazrd\\frontend\\templates')
+FRONTEND_TEMPLATE_DIR = os.path.join(BASE_DIR, 'frontend', 'templates')
+app = Flask(__name__, template_folder=FRONTEND_TEMPLATE_DIR)
 CORS(app)
 load_dotenv() 
 
