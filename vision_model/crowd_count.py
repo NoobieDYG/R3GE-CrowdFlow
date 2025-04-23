@@ -34,8 +34,10 @@ def density_to_heatmap(density_map):
     density_map = cv2.GaussianBlur(density_map, (15, 15), 0)
     density_map /= (density_map.max() + 1e-6)
     heatmap = cv2.applyColorMap((density_map * 255).astype(np.uint8), cv2.COLORMAP_JET)
+    heatmap[:, :, 0] = heatmap[:, :, 0] = (heatmap[:, :, 0] * 0.2).astype(np.uint8)
+    heatmap[:, :, 1] = (heatmap[:, :, 1] * 0.5).astype(np.uint8)
     heatmap = cv2.GaussianBlur(heatmap, (15, 15), 0)
-    heatmap_resized=cv2.resize(heatmap, (640, 480))
+    heatmap_resized=cv2.resize(heatmap, (1280, 720))
     return heatmap_resized
 
 
@@ -155,7 +157,10 @@ def send_json_data(zone_occupancy, zone_count, endpoint="http://localhost:8000/c
     cv2.destroyAllWindows()'''
 
 def process_crowd_video(video_path):
-    video_path = convert_url(video_path)
+    if video_path.startswith("https://www.youtube.com/watch?v="): #added this to check if the url is a youtube link or not otherwise directly use the path
+        video_path = convert_url(video_path)
+    elif video_path.startswith("https://youtu.be/"):
+        video_path = convert_url(video_path)
     cap = cv2.VideoCapture(video_path)
 
     if not cap.isOpened():
@@ -169,10 +174,10 @@ def process_crowd_video(video_path):
             break
 
         frame_count += 1
-        if frame_count % 10 != 0:
+        if frame_count % 27 != 0:
             continue
 
-        resized = cv2.resize(frame, (640, 480))
+        resized = cv2.resize(frame, (1280, 720))
         input_tensor = transform(resized).unsqueeze(0).to(device)
 
         if device.type == "cuda":
@@ -191,18 +196,20 @@ def process_crowd_video(video_path):
             ((0, h // 2), (w // 2, h)),          # Zone 3 - Bottom Left
             ((w // 2, h // 2), (w, h))           # Zone 4 - Bottom Right
         ]
-        zone_labels = ["Zone 1", "Zone 3", "Zone 2", "Zone 4"]
-        box_colors = [(0, 255, 0), (255, 255, 0), (0, 255, 255), (255, 0, 255)]
-        zones=zones[::-1]  # Reversing the order of zones
+        zone_labels = ["Zone 1", "Zone 2", "Zone 3", "Zone 4"]
+        box_colors = [(0, 200, 0), (200, 200, 0), (0, 200, 200), (200, 0, 200)]
+        #zones=zones[::-1]  # Reversing the order of zones
+        overlay_boxes = overlay.copy()
         for i, ((x1, y1), (x2, y2)) in enumerate(zones):
-            cv2.rectangle(overlay, (x1, y1), (x2, y2), box_colors[i], 2)
-            cv2.putText(overlay, zone_labels[i], (x1 + 10, y1 + 30),
+            cv2.rectangle(overlay_boxes, (x1, y1), (x2, y2), box_colors[i], 2)
+            cv2.putText(overlay_boxes, zone_labels[i], (x1 + 10, y1 + 30),
                         cv2.FONT_HERSHEY_SIMPLEX, 1, box_colors[i], 2) #added zone lines for better visibility
+        cv2.addWeighted(overlay_boxes, 0.5, overlay, 0.7, 0, dst=overlay)
 
         count_text = f"Count: {int(total_count)}"
         (text_width, text_height), _ = cv2.getTextSize(count_text, cv2.FONT_HERSHEY_SIMPLEX, 1.2, 2)
         cv2.putText(overlay, count_text,(overlay.shape[1] - text_width - 10, overlay.shape[0] - 20), 
-            cv2.FONT_HERSHEY_SIMPLEX, 1.2, (255, 255, 255), 2)  #added text position
+            cv2.FONT_HERSHEY_SIMPLEX, 1.2, (200, 200, 200), 2)  #added text position
 
         #cv2.putText(overlay, f"Count: {int(total_count)}", (10, 40),
                     #cv2.FONT_HERSHEY_SIMPLEX, 1.2, (255, 255, 255), 2)
