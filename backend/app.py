@@ -1,14 +1,14 @@
-from flask import Flask, request, jsonify,Response,render_template
+from flask import Flask, request, jsonify,Response,render_template,url_for
 import sys
 sys.path.append('C:/Users/Affaan Jaweed/Desktop/crowd_control_hackazrd')
 from vision_model.crowd_count import process_crowd_video
 from dotenv import load_dotenv
 import os
 import openai
+from flask_cors import CORS
 
-
-app = Flask(__name__)
-
+app = Flask(__name__,template_folder='C:\\Users\\Affaan Jaweed\\Desktop\\crowd_control_hackazrd\\frontend\\templates')
+CORS(app)
 load_dotenv() 
 
 
@@ -18,14 +18,14 @@ client=openai.OpenAI(
 )
 
 app.config['pause_suggestion']=False
-app.config['chat_history'] = None  #made a global variable to store chat history
+app.config['chat_history'] = []  #made a global variable to store chat history
 app.config['latest_zone_data'] = None  #added a global variable to store latest zone data
 
 
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index2.html')
 
 @app.route('/crowd_data', methods=['POST', 'GET'])
 def crowd_data():
@@ -51,11 +51,11 @@ def crowd_data():
         zones = list(zip(zone_counts, zone_occupancy))
     
         # Sort the zones by count in descending order (highest count first)
-        zones_sorted = sorted(zones, key=lambda x: x[0], reverse=True)
+        #zones_sorted = sorted(zones, key=lambda x: x[0], reverse=True)
     
         # Build output dictionary with zone names ("zone_1", "zone_2", etc.)
         result = {}
-        for index, (count, occupancy) in enumerate(zones_sorted, start=1):
+        for index, (count, occupancy) in enumerate(zones, start=1):
             result[f"zone_{index}"] = {"count": count, "occupancy": occupancy}
 
 
@@ -88,9 +88,9 @@ def llm_suggestion():
         count=values['count']
         occupancy=values['occupancy']
         status=(
-            "Safe" if occupancy<30 else
-            "Moderate" if occupancy<75 else
-            "Crowded - Take Action" if occupancy<95 else
+            "Safe" if occupancy<55 else
+            "Moderate" if occupancy<85 else
+            "Crowded - Take Action" if occupancy<99 else
             "Critical - Evacuate"
             )
         prompt_parts.append(f"{zone_name}: {count} people, {occupancy}% occupancy,Status: {status}")
@@ -100,8 +100,11 @@ def llm_suggestion():
         messages=[
             {"role":"system","content":'''You are a safety and crowd control specializing in managing piligrimage crowd like umrah and hajj expert providing EXTREMELY accurate and precise advice which are useful for the user. "
             "IMPORTANT RULES:
+            -Consider both counts and occupancy dont just give suggestions based on occupancy.
+            -Use the real arabic names of the gates instead of saying "gate 1" or "gate 2".
             - Give suggestions more using the gates of the mosque and the zones of the mosque.
-            - Consider the real gates which exist in Masjid Al-Haram in Makkah, Saudi Arabia.
+            - Consider ONLY the real gates of Masjid Al-Haram in Makkah, Saudi Arabia and NOT THE GATES OF PROPHET MUHAMMAD (PBUH) MOSQUE IN MADINA.
+            - Provide suggestions based on the status of the zones and the number of people in each zone.
             -Provide information only if the status is "Crowded - Take Action" or "Critical - Evacuate" else just return the status itself.
             - Dont use clauses like 'Since the status' just return the status itself.
             - Provide only the most relevant and immediate actions to take.
@@ -118,7 +121,8 @@ def llm_suggestion():
     )
     
     suggestion=response.choices[0].message.content
-    app.config['chat_history'] = suggestion  ##storing the chat history
+    app.config['chat_history'] = [
+    {"role": "assistant", "content": suggestion}]  ##storing the chat history
     #print("Suggestion:", suggestion)  # Print the suggestion to the console for debugging
     return jsonify({"suggestion": suggestion})
 
@@ -163,8 +167,33 @@ def chatbot():
     reply = response.choices[0].message.content
     app.config['chat_history'].append({"role": "user", "content": user_message})
     app.config['chat_history'].append({"role": "assistant", "content": reply})
-    
+    app.config['pause_suggestion'] = False
     return jsonify({"reply": reply})
+
+
+@app.route('/text_to_speech',methods=['POST'])
+def text_to_speech():
+    data=request.get_json()
+    text=data.get("text","")
+    if not text:
+        return jsonify({"error":"No text provided"}),400
+    speech_file_path = os.path.join(app.root_path, "static", "speech.wav")
+    os.makedirs(os.path.dirname(speech_file_path), exist_ok=True)
+    model="playai-tts-arabic"
+    voice="Nasser-PlayAI"
+    response_format="wav"
+
+    tts_response=client.audio.speech.create(
+        model=model,
+        voice=voice,
+        input=text,
+        response_format=response_format,
+    )
+    tts_response.write_to_file(speech_file_path)
+
+    return jsonify({"success":True,"audio_url":url_for('static', filename='speech.wav')})
+
+
 
 @app.route('/end_chat', methods=['POST'])
 def end_chat():
