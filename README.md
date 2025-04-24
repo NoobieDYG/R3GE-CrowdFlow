@@ -36,19 +36,19 @@ Why we chose this problem:
 
 Crowd-related disasters are very catastrophic and are uninevitable BUT can be prevented with timely data. We wanted to blend AI vision, real-time feedback, and interactivity to help reduce risks and assist authorities with actionable insights.
 
-Key challenges we addressed:
+## Key challenges we addressed:
 
-Real-time processing of crowd video streams
-Accurate person detection and zone heatmapping
-Communication via both chat and speech
-Dynamic zone risk assessment
+- Real-time processing of crowd video streams
+- Accurate person detection and zone heatmapping
+- Communication via both chat and speech
+- Dynamic zone risk assessment
 
-Pivots or breakthroughs:
+## Pivots or breakthroughs:
 
-Used CSRNet instead of YOLO for accurate data
-Integrated GROQ LLM for contextual zone suggestions
-Built custom zone-wise heatmap and TTS flow
-Shifted from basic overlays to intelligent AI commentary
+- Used CSRNet instead of YOLO for accurate data
+- Integrated GROQ LLM for contextual zone suggestions
+- Built custom zone-wise heatmap and TTS flow
+- Shifted from basic overlays to intelligent AI commentary
 
 ---
 
@@ -72,16 +72,22 @@ Shifted from basic overlays to intelligent AI commentary
 ---
 
 ## ✨ Key Features
-✅ Real-time crowd detection using CSRNet
-✅ Accurate Crowd Data with count and occupancy % for better visualization
-✅ Zone-wise heatmap overlays for density visualization
-✅ Risk analysis with dynamic AI suggestions via LLM
-✅ Voice output using Text-to-Speech for safety alerts
+* ✅ Real-time crowd detection using CSRNet
+* ✅ Accurate Crowd Data with count and occupancy % for better visualization
+* ✅ Zone-wise heatmap overlays for density visualization
+* ✅ Risk analysis with dynamic AI suggestions via LLM
+* ✅ Voice output using Text-to-Speech for safety alerts
+* ![WhatsApp Image 2025-04-24 at 17 53 16_21ab7ad0](https://github.com/user-attachments/assets/26c5b697-08c1-429c-90fe-95dd619ecbcf)
+* ![WhatsApp Image 2025-04-24 at 17 51 05_def83e0c](https://github.com/user-attachments/assets/7a242363-d6ac-41a8-9e10-4b6cba9ecc2e)
+* ![WhatsApp Image 2025-04-24 at 17 52 39_99fd5fa9](https://github.com/user-attachments/assets/ba1cc6fd-d405-4436-b2db-70f1a77e43bf)
+
+
+
 ---
 
 ## 📽️ Demo & Deliverables
 
-- **Demo Video Link:** [Paste YouTube or Loom link here]  
+- **Demo Video Link:** https://www.youtube.com/watch?v=KU4XNdZjL14  
 - **Pitch Deck / PPT Link:** [Paste Google Slides / PDF link here]  
 
 ---
@@ -114,17 +120,17 @@ pip -r 'requirements.txt'
 # Start development server
 python bacakend\app.py
 ```
-# Make sure if the weights are downloaded if not then manually download from the google drive link provided and drag it to vision_model\weights directory
+Make sure if the weights are downloaded if not then manually download from the google drive link provided and drag it to vision_model\weights directory
 GDrive Link : https://drive.google.com/drive/folders/1gvjLW4kKJlqorUgS3Hgf_nKrNiWZBnke?usp=drive_link
 
 ---
 
 ## 🧬 Future Scope
 
-📈 Add multiple camera feeds / drone integration
-🛡️ Implement user roles + admin dashboards
-🌐 Multilingual support for global accessibility
-📊 Advanced analytics dashboard with historical trends
+* 📈 Add multiple camera feeds / drone integration
+* 🛡️ Implement user roles + admin dashboards
+* 🌐 Multilingual support for global accessibility
+* 📊 Advanced analytics dashboard with historical trends
 
 ---
 
@@ -138,6 +144,8 @@ GDrive Link : https://drive.google.com/drive/folders/1gvjLW4kKJlqorUgS3Hgf_nKrNi
 
 ## 🏁 Final Words
 
-Share your hackathon journey — challenges, learnings, fun moments, or shout-outs!
+Enjoyed this journey very much. Had a beautiful first experience with my team. Learned a lot about collaborating with teammates and building a wonderful project while being inpressure about the deadline
+Kudos to the NameSpace community for organising this event
+Cheers!🍻
 
 ---
