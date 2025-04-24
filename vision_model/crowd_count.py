@@ -18,8 +18,8 @@ from csrnet_model import load_csrnet_model_1, load_csrnet_model_2
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model_1 = load_csrnet_model_1("vision_model\\weights\\csrnet_pretrained.pth", device)
-model_2=load_csrnet_model_2("vision_model\\weights\\csrnet_pretrained_2.pth", device)
+model_1 = load_csrnet_model_1(device)
+model_2=load_csrnet_model_2(device)
 if device.type == "cuda":
     model_1 = model_1.half()  #check here
     model_2 = model_2.half()  #if not rtx comment this if block
