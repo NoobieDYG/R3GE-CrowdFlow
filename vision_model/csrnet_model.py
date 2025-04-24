@@ -3,6 +3,30 @@
 import torch
 import torch.nn as nn
 from collections import OrderedDict
+import os
+import gdown
+
+def ensure_weights_downloaded(filename):
+    base_dir=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    weights_dir=os.path.join(base_dir,"vision_model","weights")
+    weights_path=os.path.join(weights_dir,filename)
+    if os.environ.get('RENDER','false').lower()=='true' and not os.pth.exists(weights_path):
+        print(f"Downloading weights file {filename} on Render..")
+        os.makedirs(weights_dir, exist_ok=True)
+
+        try:
+            file_id_map={
+                "csrnet_pretrained.pth":"1djQ-QfUVD47rqv5gplPJHYtOKWICeA2k"
+                ,"csrnet_pretrained_2.pth":"1rJBGXi7bAAiLpG8WAgq3bEyyO_VpUWY2"
+            }
+
+            if filename in file_id_map:
+                gdrive_url=f"https://drive.google.com/uc?id={file_id_map[filename]}"
+                gdown.download(gdrive_url, weights_path, quiet=False)
+                print(f"Downloaded {filename} to {weights_path}")
+        except Exception as e:
+            print(f"Error downloading {filename}: {e}")
+    return weights_path
 
 class CSRNet(nn.Module):
     def __init__(self):
@@ -34,7 +58,10 @@ class CSRNet(nn.Module):
                 in_channels = v
         return nn.Sequential(*layers)
 
-def load_csrnet_model_1(weight_path="vision_model\\weights\\csrnet_pretrained.pth", device='cpu'):
+def load_csrnet_model_1(weight_path=None, device='cpu'):
+    if weight_path is None:
+        weight_path = ensure_weights_downloaded("csrnet_pretrained.pth")
+    
     model = CSRNet().to(device)
 
     
@@ -55,7 +82,10 @@ def load_csrnet_model_1(weight_path="vision_model\\weights\\csrnet_pretrained.pt
     model.eval()
     return model
 
-def load_csrnet_model_2(weight_path="vision_model\\weights\\csrnet_pretrained_2.pth", device='cpu'):
+def load_csrnet_model_2(weight_path=None, device='cpu'):
+    if weight_path is None:
+        weight_path = ensure_weights_downloaded("csrnet_pretrained_2.pth")
+
     model = CSRNet().to(device)
 
     
