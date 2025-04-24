@@ -32,16 +32,19 @@ Imagine a festival or a piligrimage (Mahakumbh or Hajj) with thousands of attend
 - Syed Aamir (https://www.linkedin.com/in/syed-aamir-8b5591300/)
 
 ### Your Approach:  
-Why we chose this problem:
+Why we chose this problem:  
+
 Crowd-related disasters are very catastrophic and are uninevitable BUT can be prevented with timely data. We wanted to blend AI vision, real-time feedback, and interactivity to help reduce risks and assist authorities with actionable insights.
 
 Key challenges we addressed:
+
 Real-time processing of crowd video streams
 Accurate person detection and zone heatmapping
 Communication via both chat and speech
 Dynamic zone risk assessment
 
 Pivots or breakthroughs:
+
 Used CSRNet instead of YOLO for accurate data
 Integrated GROQ LLM for contextual zone suggestions
 Built custom zone-wise heatmap and TTS flow
