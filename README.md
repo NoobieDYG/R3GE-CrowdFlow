@@ -88,7 +88,7 @@ Crowd-related disasters are very catastrophic and are uninevitable BUT can be pr
 ## 📽️ Demo & Deliverables
 
 - **Demo Video Link:** https://www.youtube.com/watch?v=KU4XNdZjL14  
-- **Pitch Deck / PPT Link:** [Paste Google Slides / PDF link here]  
+- **Pitch Deck / PPT Link:** https://docs.google.com/presentation/d/1PWzBTzLtm5iHC6zk_-QWTDmxw5Rs8NNP/edit?usp=sharing&ouid=104295308132445088685&rtpof=true&sd=true  
 
 ---
 
