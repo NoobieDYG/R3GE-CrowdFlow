@@ -5,7 +5,7 @@ import torch.nn as nn
 from collections import OrderedDict
 import os
 import gdown
-
+import io
 def ensure_weights_downloaded(filename):
     base_dir=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     weights_dir=os.path.join(base_dir,"vision_model","weights")
@@ -64,8 +64,10 @@ def load_csrnet_model_1(weight_path=None, device='cpu'):
     
     model = CSRNet().to(device)
 
+    with open(weight_path, 'rb') as f:
+        buffer=io.BytesIO(f.read())
     
-    checkpoint = torch.load(weight_path, map_location=device, weights_only=False)
+    checkpoint = torch.load(buffer, map_location=device, weights_only=False)
 
     if 'state_dict' in checkpoint:
         state_dict = checkpoint['state_dict']
@@ -88,8 +90,9 @@ def load_csrnet_model_2(weight_path=None, device='cpu'):
 
     model = CSRNet().to(device)
 
-    
-    checkpoint = torch.load(weight_path, map_location=device, weights_only=False)
+    with open(weight_path, 'rb') as f:
+        buffer=io.BytesIO(f.read())
+    checkpoint = torch.load(buffer, map_location=device, weights_only=False)
 
     if 'state_dict' in checkpoint:
         state_dict = checkpoint['state_dict']
