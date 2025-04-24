@@ -6,7 +6,7 @@ from collections import OrderedDict
 import os
 import gdown
 import io
-def ensure_weights_downloaded(filename):
+'''def ensure_weights_downloaded(filename):
     base_dir=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     weights_dir=os.path.join(base_dir,"vision_model","weights")
     weights_path=os.path.join(weights_dir,filename)
@@ -26,6 +26,34 @@ def ensure_weights_downloaded(filename):
                 print(f"Downloaded {filename} to {weights_path}")
         except Exception as e:
             print(f"Error downloading {filename}: {e}")
+    return weights_path'''
+
+def ensure_weights_downloaded(filename):
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    weights_dir = os.path.join(base_dir, "vision_model", "weights")
+    weights_path = os.path.join(weights_dir, filename)
+
+    print(f"[DEBUG] Checking weights at: {weights_path}")
+    
+    if not os.path.exists(weights_path):
+        print(f"[DEBUG] {filename} not found, downloading...")
+        os.makedirs(weights_dir, exist_ok=True)
+
+        try:
+            file_id_map = {
+                "csrnet_pretrained.pth": "1djQ-QfUVD47rqv5gplPJHYtOKWICeA2k",
+                "csrnet_pretrained_2.pth": "1rJBGXi7bAAiLpG8WAgq3bEyyO_VpUWY2"
+            }
+
+            if filename in file_id_map:
+                gdrive_url = f"https://drive.google.com/uc?id={file_id_map[filename]}"
+                gdown.download(gdrive_url, weights_path, quiet=False)
+                print(f"[DEBUG] Downloaded {filename} to {weights_path}")
+            else:
+                print(f"[ERROR] Unknown filename: {filename}")
+        except Exception as e:
+            print(f"[ERROR] Failed to download {filename}: {e}")
+    
     return weights_path
 
 class CSRNet(nn.Module):
@@ -64,6 +92,8 @@ def load_csrnet_model_1(weight_path=None, device='cpu'):
     
     model = CSRNet().to(device)
 
+    print(f"[DEBUG] Loading model from: {weight_path}")
+
     with open(weight_path, 'rb') as f:
         buffer=io.BytesIO(f.read())
     
@@ -89,6 +119,8 @@ def load_csrnet_model_2(weight_path=None, device='cpu'):
         weight_path = ensure_weights_downloaded("csrnet_pretrained_2.pth")
 
     model = CSRNet().to(device)
+    
+    print(f"[DEBUG] Loading model from: {weight_path}")
 
     with open(weight_path, 'rb') as f:
         buffer=io.BytesIO(f.read())
