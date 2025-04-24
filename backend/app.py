@@ -7,7 +7,7 @@ sys.path.append(BASE_DIR)
 from vision_model.crowd_count import process_crowd_video
 
 from dotenv import load_dotenv
-import openai
+from openai import OpenAI
 from flask_cors import CORS
 
 FRONTEND_TEMPLATE_DIR = os.path.join(BASE_DIR, 'frontend', 'templates')
@@ -16,7 +16,7 @@ CORS(app)
 load_dotenv() 
 
 
-client=openai.OpenAI(
+client=OpenAI(
     base_url="https://api.groq.com/openai/v1",
     api_key=os.environ.get("GROQ_API_KEY"),
 )
