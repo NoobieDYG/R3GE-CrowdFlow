@@ -59,7 +59,7 @@ class CSRNet(nn.Module):
         return nn.Sequential(*layers)
 
 def load_csrnet_model_1(weight_path=None, device='cpu'):
-    if weight_path is None:
+    if weight_path is None or not os.path.exists(weight_path):
         weight_path = ensure_weights_downloaded("csrnet_pretrained.pth")
     
     model = CSRNet().to(device)
@@ -85,7 +85,7 @@ def load_csrnet_model_1(weight_path=None, device='cpu'):
     return model
 
 def load_csrnet_model_2(weight_path=None, device='cpu'):
-    if weight_path is None:
+    if weight_path is None or not os.path.exists(weight_path):
         weight_path = ensure_weights_downloaded("csrnet_pretrained_2.pth")
 
     model = CSRNet().to(device)
