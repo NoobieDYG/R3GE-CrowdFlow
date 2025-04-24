@@ -10,7 +10,7 @@ def ensure_weights_downloaded(filename):
     base_dir=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     weights_dir=os.path.join(base_dir,"vision_model","weights")
     weights_path=os.path.join(weights_dir,filename)
-    if os.environ.get('RENDER','false').lower()=='true' and not os.pth.exists(weights_path):
+    if os.environ.get('RENDER','false').lower()=='true' and not os.path.exists(weights_path):
         print(f"Downloading weights file {filename} on Render..")
         os.makedirs(weights_dir, exist_ok=True)
 
