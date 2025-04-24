@@ -17,7 +17,7 @@ torch==2.6.0
 torchvision==0.21.0
 ultralytics==8.3.107
 
-openai==openai-1.76.0
+openai==1.76.0
 yt-dlp==2025.3.31
 idna==3.10
 git-filter-repo==2.47.0
