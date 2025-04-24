@@ -7,3 +7,4 @@ __pycache__/
 yolov8n.pt
 yolov8x.pt
 backend/.env
+vision_model/weights/
