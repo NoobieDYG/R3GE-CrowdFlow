@@ -17,12 +17,13 @@ from vision_script_cv import convert_url
 from csrnet_model import load_csrnet_model_1, load_csrnet_model_2
 
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model_1 = load_csrnet_model_1(device=device)
-model_2=load_csrnet_model_2(device=device)
-if device.type == "cuda":
-    model_1 = model_1.half()  #check here
-    model_2 = model_2.half()  #if not rtx comment this if block
+#device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+#model_1 = load_csrnet_model_1(device=device)
+#model_2=load_csrnet_model_2(device=device)
+model_2=None
+#if device.type == "cuda":
+    #model_1 = model_1.half()  #check here
+    #model_2 = model_2.half()  #if not rtx comment this if block
 
 
 transform = transforms.Compose([
@@ -31,6 +32,17 @@ transform = transforms.Compose([
                          std=[0.229, 0.224, 0.225]),
 ])
 
+def initialize_models():
+    global model_2
+
+    if model_2 is None:
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        model_2 = load_csrnet_model_2(device=device)
+
+        if device.type == "cuda":
+            model_2 = model_2.half()
+        print("Model initialized successfully.")
+    return device
 
 def density_to_heatmap(density_map):
     density_map = density_map.squeeze().cpu().numpy()
@@ -160,6 +172,7 @@ def send_json_data(zone_occupancy, zone_count, endpoint="http://localhost:8000/c
     cv2.destroyAllWindows()'''
 
 def process_crowd_video(video_path):
+    device=initialize_models()
     if video_path.startswith("https://www.youtube.com/watch?v="): #added this to check if the url is a youtube link or not otherwise directly use the path
         video_path = convert_url(video_path)
     elif video_path.startswith("https://youtu.be/"):
