@@ -102,7 +102,7 @@ def get_zone_counts(density_map, zones=(2, 2)):
     except Exception as e:
         print("JSON send failed:", e)'''
 
-def send_json_data(zone_occupancy, zone_count, endpoint="http://localhost:8000/crowd_data"):
+def send_json_data(zone_occupancy, zone_count, endpoint="http://localhost:5000/crowd_data"):
     try:
         
         converted_count = [round(val.item()) if hasattr(val, 'item') else round(val) for val in zone_count]
