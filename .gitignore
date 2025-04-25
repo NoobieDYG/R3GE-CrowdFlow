@@ -8,3 +8,6 @@ yolov8n.pt
 yolov8x.pt
 backend/.env
 vision_model/weights/
+backend/static/speech.wav
+CrowdFlow.jpg
+demo video .mp4
