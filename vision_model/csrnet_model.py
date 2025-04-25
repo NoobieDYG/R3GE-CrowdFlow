@@ -49,7 +49,7 @@ def ensure_weights_downloaded(filename):
 
             if filename in file_id_map:
                 gdrive_url = f"https://drive.google.com/uc?id={file_id_map[filename]}"
-                gdown.download(gdrive_url, weights_path, quiet=False)
+                gdown.download (gdrive_url, weights_path, quiet=False,fuzzy=True)
                 print(f"Downloaded {filename} to {weights_path}")
         except Exception as e:
             print(f"Error downloading {filename}: {e}")
