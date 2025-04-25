@@ -6,6 +6,7 @@ from collections import OrderedDict
 import os
 import gdown
 import io
+import requests
 '''def ensure_weights_downloaded(filename):
     base_dir=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     weights_dir=os.path.join(base_dir,"vision_model","weights")
@@ -40,28 +41,52 @@ def ensure_weights_downloaded(filename):
         print(f"Downloading weights file {filename} on Render..")
         
         try:
-            # Map filenames to Hugging Face repo IDs and filenames
-            hf_file_map = {
-                "csrnet_pretrained_2.pth": {"repo_id": "noobie2dyg/csrnet_pretrained_2", "filename": "csrnet_pretrained_2.pth"}
+            # Direct download from HuggingFace using requests (no authentication needed for public models)
+            import requests
+            
+            # Map filenames to direct URLs
+            url_map = {
+                "csrnet_pretrained.pth": "https://huggingface.co/noobie2dyg/csrnet-models/resolve/main/csrnet_pretrained.pth",
+                "csrnet_pretrained_2.pth": "https://huggingface.co/noobie2dyg/csrnet-models/resolve/main/csrnet_pretrained_2.pth"
             }
             
-            if filename in hf_file_map:
-                from huggingface_hub import hf_hub_download
+            if filename in url_map:
+                url = url_map[filename]
+                print(f"Downloading from URL: {url}")
                 
-                file_info = hf_file_map[filename]
-                downloaded_path = hf_hub_download(
-                    repo_id=file_info["repo_id"],
-                    filename=file_info["filename"],
-                    # token="hf_xxx"  # Uncomment and add your token if needed for private repos
-                )
+                # Create a session with a user agent to avoid potential blocks
+                session = requests.Session()
+                session.headers.update({
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                })
                 
-                # Copy the file to your intended location
-                import shutil
-                shutil.copyfile(downloaded_path, weights_path)
+                # Download with progress reporting
+                response = session.get(url, stream=True)
+                response.raise_for_status()
                 
-                print(f"Downloaded {filename} to {weights_path}")
+                total_size = int(response.headers.get('content-length', 0))
+                block_size = 8192
+                
+                with open(weights_path, 'wb') as f:
+                    for chunk in response.iter_content(chunk_size=block_size):
+                        if chunk:
+                            f.write(chunk)
+                
+                print(f"Successfully downloaded {filename} to {weights_path}")
+                
+                # Verify file exists and has content
+                if os.path.exists(weights_path) and os.path.getsize(weights_path) > 0:
+                    print(f"File verified: {weights_path} ({os.path.getsize(weights_path)} bytes)")
+                else:
+                    print(f"Warning: File may not have downloaded correctly. Size: {os.path.getsize(weights_path) if os.path.exists(weights_path) else 'file not found'}")
+            else:
+                print(f"No URL mapping found for {filename}")
+                
         except Exception as e:
             print(f"Error downloading {filename}: {e}")
+            print(f"Error type: {type(e).__name__}")
+            import traceback
+            print(f"Traceback: {traceback.format_exc()}")
     
     return weights_path
 
