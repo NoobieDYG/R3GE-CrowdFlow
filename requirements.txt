@@ -24,3 +24,5 @@ git-filter-repo==2.47.0
 gdown==4.7.1
 Werkzeug==2.2.3
 pafy
+
+huggingface_hub==0.30.2
