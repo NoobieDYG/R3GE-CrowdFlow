@@ -32,24 +32,33 @@ def ensure_weights_downloaded(filename):
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     weights_dir = os.path.join(base_dir, "vision_model", "weights")
     weights_path = os.path.join(weights_dir, filename)
-
     
     if not os.path.exists(weights_dir):
         os.makedirs(weights_dir, exist_ok=True)
-    
     
     if os.environ.get('RENDER', 'false').lower() == 'true' and not os.path.exists(weights_path):
         print(f"Downloading weights file {filename} on Render..")
         
         try:
-            file_id_map = {
-                "csrnet_pretrained.pth": "1djQ-QfUVD47rqv5gplPJHYtOKWICeA2k",
-                "csrnet_pretrained_2.pth": "1rJBGXi7bAAiLpG8WAgq3bEyyO_VpUWY2"
+            # Map filenames to Hugging Face repo IDs and filenames
+            hf_file_map = {
+                "csrnet_pretrained_2.pth": {"repo_id": "noobie2dyg/csrnet_pretrained_2", "filename": "csrnet_pretrained_2.pth"}
             }
-
-            if filename in file_id_map:
-                gdrive_url = f"https://drive.google.com/uc?id={file_id_map[filename]}"
-                gdown.download (gdrive_url, weights_path, quiet=False,fuzzy=True)
+            
+            if filename in hf_file_map:
+                from huggingface_hub import hf_hub_download
+                
+                file_info = hf_file_map[filename]
+                downloaded_path = hf_hub_download(
+                    repo_id=file_info["repo_id"],
+                    filename=file_info["filename"],
+                    # token="hf_xxx"  # Uncomment and add your token if needed for private repos
+                )
+                
+                # Copy the file to your intended location
+                import shutil
+                shutil.copyfile(downloaded_path, weights_path)
+                
                 print(f"Downloaded {filename} to {weights_path}")
         except Exception as e:
             print(f"Error downloading {filename}: {e}")
